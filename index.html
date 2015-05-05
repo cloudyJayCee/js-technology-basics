@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <script type="text/javascript" src="http://code.jquery.com/jquery-1.11.2.min.js"></script>
+</head>
+<body>
+<section class="hbox stretch">
+
+    <aside>
+
+        <section class="vbox">
+
+            <header class="header bg-light lter bg-gradient b-b">
+                <div class="pull-right">
+                    <input type="text" id="new-task-text" value="<Task Text>"/>
+                    <input type="datetime-local" id="new-task-datetime" style="line-height: 15px;"/>
+                    <button class="btn btn-success btn-sm pull-right btn-icon" id="new-task">+
+                    </button>
+                </div>
+
+                <p>Tasks</p>
+            </header>
+
+            <section class="bg-light lter w-f">
+                <section class="hbox stretch"> <!-- .aside -->
+                    <aside>
+                        <section class="vbox">
+                            <section class="scrollable wrapper"> <!-- task list -->
+                                <ul id="task-list" class="list-group list-group-sp">
+                                    <li class="list-group-item hover">
+                                        <div class="view" id="task-1">
+                                            <button class="destroy close hover-action">×</button>
+                                            <div class="checkbox"><input class="toggle" type="checkbox"> <span
+                                                    class="task-name">New task</span></div>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </section>
+                        </section>
+                    </aside>
+                    <!-- /.aside --> </section>
+            </section>
+
+
+            <!-- Footer -->
+            <footer class="footer bg-white-only b-t">
+                <p>
+
+                </p>
+                <p class="checkbox">
+                    <label>
+                        <input id="toggle-all" type="checkbox"> Mark all as complete
+                    </label>
+                </p>
+            </footer>
+
+        </section>
+
+    </aside>
+
+</section>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+
+<script type="text/javascript">
+    var taskTemplate = $('.list-group-item').clone();
+    clearList();
+    initDOM();
+
+    // Stages
+    //stageGeneral();
+    //stageFunctions();
+    //stageObjects();
+
+    //stageBoxing();
+    //stageControlStructures();
+    //stageScope();
+    //stageArrays();
+    //stageLoops();
+    //stageExceptionHandling();
+
+
+    /*
+        General
+    */
+    function stageGeneral() {
+        var firstTask = '1. Prepare seminar presentation'; /* Notice the typing */
+        var secondTask = 2 + ". Present at university";
+
+        var firstTaskDone = true;
+        var secondTaskDone = false;
+
+        createTask(firstTask, firstTaskDone);
+        createTask(secondTask, secondTaskDone);
+
+        var taskCounter = 0; /* Console demonstration */
+        var floatingTaskCounter = 0.0;
+    }
+
+
+    /*
+        Functions
+     */
+    function stageFunctions() {
+        function addTask(name, state, due) {
+            createTask(name + '(Due: ' + due.toLocaleDateString("de-DE") + ')', state)
+        }
+
+        var addTaskFunction = function(name, state, due) {
+            // Anonymous function
+            createTask(name + '(Due: ' + due.toLocaleDateString() + ')', state)
+        };
+
+        addTask('Named function task', false, new Date());
+        addTaskFunction('Anonymous function task', false, new Date());
+    }
+
+
+    /*
+        Objects
+    */
+    function stageObjects() {
+        var task = {
+            name: 'My new task',
+            due: new Date() + 1,
+            done: false
+        };
+        createTask(task.name, task['done'], task.due);
+    }
+
+    /*
+        Boxing
+    */
+    function stageBoxing() {
+        /*
+            var str = 'My task';
+            str.due = new Date();
+            str.done = true;
+        */
+        var str = 'Boxed';
+        console.log('Before changing function [str]: ' + str.substr(0,1)); // -> B
+        str.substr = function() { console.log('Really boxed?'); };
+        console.log('After changing function [str]: ' + str.substr(0,1)); // -> B
+        var str = new String('Boxed');
+        console.log('Before changing function [String]: ' + str.substr(0,1)); // -> B
+        str.substr = function() { console.log('Really boxed?'); };
+        console.log('After changing function [String]: ' + str.substr(0,1)); // -> B
+    }
+
+    /*
+     Control structures
+     */
+    function stageControlStructures() {
+        var recurrenceEnum = {
+            WEEKLY: 0,
+            MONTHLY: 1
+        };
+
+        var complexTask = {
+            name: 'My week task',
+            recurring: recurrenceEnum.WEEKLY,
+            due: new Date()
+        };
+
+        createTask(complexTask.name, false, complexTask.due);
+
+        if (complexTask.recurring == recurrenceEnum.WEEKLY) {
+            complexTask.due.setDate(complexTask.due.getDate() + 7);
+        } else if (complexTask.recurring == recurrenceEnum.MONTHLY) {
+            complexTask.due = new Date(new Date(complexTask.due).setMonth(complexTask.due.getMonth() + 1));
+        } else {
+            console.log('No recurrence defined for task ' + complexTask.name );
+        }
+
+        createTask(complexTask.name, false, complexTask.due);
+
+        // Reschedule the task - Equivalent
+        switch (complexTask.recurring) {
+            case recurrenceEnum.WEEKLY:
+                complexTask.due.setDate(complexTask.due.getDate() + 7);
+                break;
+            case recurrenceEnum.MONTHLY:
+                complexTask.due = new Date(new Date(complexTask.due).setMonth(complexTask.due.getMonth() + 1));
+                break;
+            default:
+                console.log('No recurrence defined for task ' + complexTask.name );
+                break;
+        }
+        createTask(complexTask.name, false, complexTask.due);
+
+        // You can also do:
+        var str = 'General task';
+        switch (str) {
+            case 'General task':
+                console.log('String comparison in switches :)');
+                break;
+        }
+
+    }
+
+    /*
+        Scope
+    */
+    function stageScope() {
+        globalVariable = 'Im on window';
+        var localVariable = 'Im not permanent';
+        console.log('What is ' + this.toString());
+        var self = this;
+        var object = {};
+        object.sampleFunction = function(name, state, due) {
+            console.log(localVariable);
+            var localVariable = 'Im function scoped';
+            console.log(localVariable);
+            console.log('What is ' + this + ' or ' + self);
+        };
+        object.sampleFunction('Test the scope', false)
+    }
+
+
+    /*
+        Arrays
+    */
+    function stageArrays() {
+        var task = {
+            name: 'My new task',
+            due: new Date() + 1,
+            done: false
+        };
+        var taskList = [/*task*/];
+        var taskListObject = new Array(/*task*/);
+        taskList.push({
+            name: 'New task - inline',
+            done: false
+        });
+        taskList.push(task);
+        /*taskList.pop(task)*/
+    }
+
+
+    /*
+        Loops
+    */
+    function stageLoops() {
+        var task = {
+            name: 'My new task',
+            due: new Date() + 1,
+            done: false
+        };
+        var taskList = [];
+        taskList.push({
+            name: 'New task - inline',
+            done: true
+
+        });
+        taskList.push(task);
+
+        var doneCounter = 0;
+        for (var i in taskList) {
+            if (taskList[i].done) {
+                doneCounter++;
+            }
+        }
+        console.log('Done tasks [for Loop]: ' + doneCounter);
+
+        var taskCount = taskList.length - 1;
+        doneCounter = 0;
+        do {
+            if (taskList[taskCount].done) doneCounter++;
+            taskCount--;
+        } while (taskCount >= 0);
+        console.log('Done tasks [do Loop]: ' + doneCounter);
+
+    }
+
+    /*
+        Exception handling
+    */
+    function stageExceptionHandling() {
+        function addTaskSafe(name, state, due) {
+            debugger;
+            if (due  < new Date()) throw new Error('Due may not be in the past');
+            createTask(name + '(Due: ' + due + ')', state)
+        }
+        try {
+            addTaskSafe('Buy Christmas presents', false, new Date('12/22/2014'));
+        }
+        catch (ex) {
+            console.log(ex);
+        }
+    }
+
+    /*
+        Actual implementation
+     */
+    Date.prototype.yyyymmdd = function() {
+        var yyyy = this.getFullYear().toString();
+        var mm = (this.getMonth()+1).toString(); // getMonth() is zero-based
+        var dd  = this.getDate().toString();
+        return yyyy + (mm[1]?mm:"0"+mm[0]) + (dd[1]?dd:"0"+dd[0]); // padding
+    };
+
+    function initDOM() {
+        var taskTextElement = $('#new-task-text');
+        var taskTimeElement = $('#new-task-datetime');
+        taskTimeElement.val(new Date().toJSON().slice(0,19));
+
+        $('#new-task').click(function() {
+            // Add a task
+            var taskText = taskTextElement.val();
+            var taskDue = new Date(taskTimeElement.val());
+
+            createTask(taskText + ' (Due: ' + taskDue.toLocaleDateString("de-DE") + ')', false);
+        });
+
+        taskTemplate.find('input').change(function() {
+            $(this).parent().find('span').toggleClass('done');
+        });
+
+        $('#toggle-all').change(function () {
+           $('li.list-group-item').each(function () {
+               var hasClass = $(this).find('span').hasClass('done');
+               if (!hasClass) { $(this).find('span').addClass('done') } else $(this).find('span').removeClass('done');
+               var checked = $(this).find('input').prop('checked');
+               $(this).find('input').prop('checked', !checked);
+           });
+        });
+    }
+
+    function clearList() {
+        $('#task-list').html('');
+    }
+
+    function createTask(name, state, due) {
+        var taskList = $('#task-list');
+        var newTask = taskTemplate.clone(true, true);
+
+        // Exception handling
+        /*
+        if ((due) && (due  < (new Date())))  {
+            throw new Error('Due may not be in the past');
+        }
+        */
+        newTask.children().attr('id', 'task-' + taskList.children().length);
+
+        if (due) {
+            name = name + '(Due: ' + due + ')'
+        }
+
+        newTask.find('span.task-name').text(name);
+        newTask.find('input').prop('checked', state);
+        if (state) newTask.find('span').toggleClass('done');
+        newTask.find('.destroy').click(function() {
+           newTask.remove();
+        });
+
+        taskList.append(newTask);
+    }
+
+
+
+</script>
+
+</body>
+</html>
